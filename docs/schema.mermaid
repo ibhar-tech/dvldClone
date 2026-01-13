@@ -1,0 +1,89 @@
+erDiagram
+    %% Core Lookups
+    countries ||--|{ drivers : "origin of"
+    application_types ||--|{ applications : "type of"
+    application_statuses ||--|{ applications : "status of"
+    license_classes ||--|{ local_driving_license_applications : "class for"
+    license_classes ||--|{ licenses : "class of"
+    test_types ||--|{ test_appointments : "type of"
+    issue_reasons ||--|{ licenses : "reason for"
+
+    %% Main Entities
+    drivers ||--o{ applications : "initiates"
+    drivers ||--o{ licenses : "holds"
+    drivers ||--o{ international_licenses : "holds"
+    
+    applications ||--o| local_driving_license_applications : "details"
+    applications ||--o{ licenses : "generates"
+    applications ||--o{ international_licenses : "generates"
+    
+    local_driving_license_applications ||--o{ test_appointments : "schedules"
+    test_appointments ||--o| tests : "results in"
+    
+    licenses ||--o{ detained_licenses : "detained in"
+    licenses ||--o{ international_licenses : "base for"
+
+    countries {
+        UUID country_id PK
+        VARCHAR country_name
+    }
+
+    drivers {
+        UUID driver_id PK
+        VARCHAR national_number
+        VARCHAR first_name
+        VARCHAR last_name
+        TIMESTAMP date_of_birth
+        BOOL is_female
+        UUID country_id FK
+    }
+
+    applications {
+        UUID application_id PK
+        UUID driver_id FK
+        UUID application_type_id FK
+        UUID application_status_id FK
+        DECIMAL paid_fees
+    }
+
+    local_driving_license_applications {
+        UUID local_driving_license_application_id PK
+        UUID application_id FK "Unique"
+        UUID license_class_id FK
+    }
+
+    test_appointments {
+        UUID test_appointment_id PK
+        UUID test_type_id FK
+        UUID local_driving_license_application_id FK
+        BOOL is_locked
+    }
+
+    tests {
+        UUID test_id PK
+        UUID test_appointment_id FK "Unique"
+        BOOL is_test_passed
+    }
+
+    licenses {
+        UUID license_id PK
+        UUID application_id FK
+        UUID driver_id FK
+        UUID license_class_id FK
+        TIMESTAMP expiration_date
+        BOOL is_active
+    }
+
+    detained_licenses {
+        UUID detain_id PK
+        UUID license_id FK
+        BOOL is_released
+        DECIMAL fine_fees
+    }
+
+    international_licenses {
+        UUID international_license_id PK
+        UUID application_id FK
+        UUID driver_id FK
+        UUID issued_using_local_license_id FK
+    }
