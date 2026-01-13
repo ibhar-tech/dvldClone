@@ -8,20 +8,15 @@ DECLARE
 BEGIN
     -- =====================================================
     -- 1. AUTH USER SETUP
-    -- =====================================================
-    CREATE EXTENSION IF NOT EXISTS pgcrypto;
-    
+    -- =====================================================    
     -- Check if user exists first to avoid ON CONFLICT issues
     SELECT id INTO v_user_id FROM auth.users WHERE email = 'admin@ibhartech.com';
     
-    IF v_user_id IS NULL THEN
-        v_user_id := gen_random_uuid();
-        INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
-        VALUES (
-            '00000000-0000-0000-0000-000000000000', v_user_id, 'authenticated', 'authenticated', 'admin@ibhartech.com', 
-            crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{}', NOW(), NOW()
-        );
-    END IF;
+    v_user_id := gen_random_uuid();
+    INSERT INTO auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, recovery_sent_at, last_sign_in_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
+    VALUES ('00000000-0000-0000-0000-000000000000', v_user_id, 'authenticated', 'authenticated', 'admin@ibhartech.com', 
+        crypt('password123', gen_salt('bf')), NOW(), NOW(), NOW(), '{"provider":"email","providers":["email"]}', '{}', NOW(), NOW(), '', '', '', ''
+    );
 
     -- =====================================================
     -- 2. CLEANUP
